@@ -10,6 +10,10 @@ An _estate_ is a git repository declaring one or more _forts_:
 - `estate.toml` declares the **Mesh** network CIDR and source repository URL.
 - `forts/<fort>.toml` declares a fort's size and its place on the estate's **Mesh** network.
 
+Each _branch_ in this repository is a complete scaffolding of an estate. Clone the branch into a new repository, customize the network and fort definitions, then run `fort mint` and provision each fort. You'll end up with a complete environment that continuously reconciles itself against your estate repo.
+
+Each branch has a customized README.md (AI Generated) tailored to the example scenario. Have fun building! - sf1tzp
+
 ---
 
 ## Repo Structure
