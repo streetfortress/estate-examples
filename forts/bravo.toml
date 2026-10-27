@@ -1,0 +1,14 @@
+# bravo — a plain lab fort of estate-b. It consumes the metrics role
+# alpha (of estate-a) serves this estate over the link; nothing about
+# the link appears here. The remotes entry in mesh/peers.json is what
+# makes alpha reachable, and every fort of this estate peers with it.
+mesh_ip = "10.12.0.10"
+
+[shape]
+vcpus = 2
+memory = 4
+disk = "40G"
+
+[libvirt]
+uri = "qemu+ssh://hypervisor.example/system"
+ip = "192.168.1.12"

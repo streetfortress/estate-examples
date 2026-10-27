@@ -1,0 +1,76 @@
+{
+  description = "estate-b — the NixOS configurations of its forts, built on sfi/forts";
+
+  inputs = {
+    # The framework: the modules a fort is made of, and the fort CLI. Pin
+    # it in flake.lock; `nix flake update forts` is the update, `fort
+    # check` reports drift. Develop against a local checkout with
+    # `--override-input forts path:../forts`.
+    forts.url = "git+https://github.com/streetfortress/forts";
+    # nixpkgs and sops-nix are the framework's pins: one nixpkgs for the
+    # modules and the hosts, so a fort builds against what the framework
+    # was tested on.
+    nixpkgs.follows = "forts/nixpkgs";
+    sops-nix.follows = "forts/sops-nix";
+  };
+
+  outputs = inputs@{ self, forts, nixpkgs, sops-nix, ... }:
+    let
+      lib = nixpkgs.lib;
+      system = "x86_64-linux";
+
+      # Hosts are self-describing: each hosts/<name>/default.nix (rendered
+      # by `fort scaffold` from forts/<name>.toml) imports what it is —
+      # inputs.forts.nixosModules.*, its secrets.nix, a runtime module —
+      # and sets sfi.estate.root, so the module set here is uniform and
+      # a new host dir needs no edit here.
+      hosts = lib.attrNames (lib.filterAttrs
+        (name: type: type == "directory")
+        (builtins.readDir ./hosts));
+
+      mkHost = hostname: lib.nixosSystem {
+        inherit system;
+        specialArgs = { inherit inputs; };
+        modules = [
+          forts.nixosModules.common
+          ./hosts/${hostname}
+          sops-nix.nixosModules.sops
+        ];
+      };
+
+      configs = lib.genAttrs hosts mkHost;
+
+      # One image package per host, the variant chosen by the host's own
+      # sfi.platform (its runtime module): `fort image <host>` builds
+      # ./nixos#<host>-qcow, -linode or -baremetal.
+      images = lib.listToAttrs (map (hostname:
+        let
+          cfg = configs.${hostname}.config;
+          variant = {
+            qemu = { suffix = "qcow"; image = cfg.system.build.images.qemu; };
+            linode = { suffix = "linode"; image = cfg.system.build.images.linode; };
+            baremetal = { suffix = "baremetal"; image = cfg.system.build.images.raw-efi; };
+          }.${cfg.sfi.platform};
+        in {
+          name = "${hostname}-${variant.suffix}";
+          value = variant.image;
+        }) hosts);
+
+      # The layers this estate installs (docs/layers.md): one line per
+      # role, written by `fort layer add` and removed by `fort layer
+      # remove` — the role's binary at the layer's own pin, so the gate
+      # runs `nix run ./nixos#fort-<role> -- check --all` and an operator
+      # has `fort <role> <verb>` from the same lock. Core reads nothing
+      # under layers/; this set is the whole of what the flake knows.
+      layers = sys: {
+      };
+
+      # The fort CLI at the framework's pin, on whatever machine runs it:
+      # `nix run ./nixos#fort -- check --all`.
+      fortFor = lib.genAttrs (lib.attrNames forts.packages)
+        (sys: { fort = forts.packages.${sys}.fort; } // layers sys);
+    in {
+      nixosConfigurations = configs;
+      packages = lib.recursiveUpdate fortFor { ${system} = images; };
+    };
+}

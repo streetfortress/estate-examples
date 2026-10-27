@@ -1,0 +1,12 @@
+{
+  "peers": {},
+  "clients": {},
+  "remotes": {
+    "alpha": {
+      "wg_vpn_ip": "10.12.0.254",
+      "wg_endpoint_ip": "192.168.1.11",
+      "wg_endpoint_port": 51821,
+      "public_key": "i9JIKC5eQzSs55lwQjHQvrwB0PQtAbiyeZbKYozgSxM="
+    }
+  }
+}
