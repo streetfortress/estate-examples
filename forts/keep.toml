@@ -1,0 +1,13 @@
+# keep — the one fort of the minimal estate: a lab VM on a libvirt
+# hypervisor, no [cluster] table. The hardened host, the mesh, the
+# deployer account and the ops verbs, and nothing else.
+mesh_ip = "10.10.0.10"
+
+[shape]
+vcpus = 2
+memory = 4
+disk = "40G"
+
+[libvirt]
+uri = "qemu+ssh://hypervisor.example/system"   # the machine that raises it — point this at yours
+ip = "192.168.1.10"                            # the VM's LAN address

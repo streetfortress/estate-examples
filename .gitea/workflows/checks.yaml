@@ -1,0 +1,99 @@
+# The estate's gate, on every push: `fort check --all --eval` — tree ↔
+# manifests, kustomize builds, strict envsubst, the mesh and the links,
+# then a full module-system eval of every host that has a manifest. It
+# comes from the framework this estate pins: `nix run ./nixos#fort` is
+# the CLI at that pin. A layer's gate is its own step after the core's
+# (docs/layers.md; `fort layer add` appends it).
+#
+# Two red-X states are DELIBERATE gates, not breakage: a staged-but-
+# unseeded app tree (listed-but-absent sops files fail kustomize) and a
+# staged-but-unprovisioned host (a missing mesh peer fails nix eval).
+# Such PRs go green when the provisioning replay seeds identity + secrets.
+name: checks
+
+on:
+  push:
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    # The closure of the framework pin comes from the runner's own cache
+    # server, not from cache.nixos.org on every push (forts#75). act_runner
+    # starts a fresh job container per run, so nothing in /nix survives a
+    # run. What survives is one actions/cache entry that holds a Nix
+    # *binary cache* directory — narinfo and nar files, which are ordinary
+    # files a tar can carry. The store itself is never in the tar: nix
+    # reads the restored directory as a substituter and imports only the
+    # paths this run asks for, so no restore has to reproduce
+    # /nix/store's ownership or its read-only paths.
+    env:
+      # priority 10 wins against cache.nixos.org's 40, so a path the cache
+      # holds never goes over the WAN. trusted=true accepts the unsigned
+      # narinfo that `nix copy` writes when no signing key exists; the
+      # entry is private to this repository, and only its own runs write it.
+      NIX_CONFIG: |
+        extra-substituters = file:///nix-closure-cache?trusted=true&priority=10
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: DeterminateSystems/nix-installer-action@v16
+
+      - name: Restore the closure of the framework pin
+        id: closure
+        uses: actions/cache@v4
+        with:
+          path: /nix-closure-cache
+          key: nix-closure-v2-${{ hashFiles('nixos/flake.lock') }}
+          # A moved pin restores the previous cache and fetches the delta.
+          restore-keys: nix-closure-v2-
+
+      - name: The cache directory exists before nix reads it
+        # nix refuses a file:// substituter whose directory is absent, and
+        # a full miss restores nothing.
+        run: mkdir -p /nix-closure-cache
+
+      # This estate ships unminted (no identity, no secrets), so CI first
+      # performs the same ritual a new owner does, with ephemeral output:
+      # mint the fort, seed the one secret init cannot write, then gate.
+      # Green here means: clone this branch, follow the README, and the
+      # estate you get checks and evaluates clean.
+      - name: Mint the fort (ephemeral — encryption only, nothing persists)
+        run: nix run ./nixos#fort -- mint keep --write
+
+      - name: Seed the edge Alertmanager webhook (a placeholder secret)
+        run: |
+          set -euo pipefail
+          f=flux/infrastructure/configs/monitoring/alertmanager-edge-config.sops.yaml
+          cat > "$f" <<'YAML'
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: alertmanager-edge-config
+            namespace: monitoring
+          stringData:
+            webhook-url: https://example.invalid/hook
+          YAML
+          nix shell nixpkgs#sops -c sops --config .sops.yaml -e -i "$f"
+
+      - name: The gate (fort check --all --eval)
+        env:
+          GITEA_ACTIONS: "true"
+        run: nix run ./nixos#fort -- check --all --eval
+
+      - name: Refill the cache with what this run used
+        # An exact hit refills nothing: the bulk is nixpkgs, and nixpkgs
+        # moves only when nixos/flake.lock moves. A moved lock, or no
+        # cache, writes the directory again from the store, so the cache
+        # holds this closure and no path of an older one.
+        if: steps.closure.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          rm -rf /nix-closure-cache
+          mkdir -p /nix-closure-cache
+          # Every eval writes .drv files, and nix substitutes none of them:
+          # they were 4526 of the 5428 paths in the first entry, for 9MB of
+          # its 625MB. The gain is the file count, not the bytes — the copy,
+          # the tar and the restore each handle 902 paths instead of 5428.
+          nix path-info --all | grep -v '\.drv$' \
+            | xargs nix copy --to "file:///nix-closure-cache?compression=zstd"
+          du -sh /nix-closure-cache
