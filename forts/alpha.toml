@@ -1,0 +1,26 @@
+# alpha — a plain lab fort that also serves estate-b a metrics role over
+# an estate link: alpha joins estate-b's mesh, and estate-b's forts
+# reach it at alpha.estate-b.mesh on the ports the role opens.
+mesh_ip = "10.11.0.10"
+
+[shape]
+vcpus = 2
+memory = 4
+disk = "40G"
+
+[libvirt]
+uri = "qemu+ssh://hypervisor.example/system"
+ip = "192.168.1.11"
+
+# This host on estate-b's mesh. `fort link add alpha <estate-b url> --write`
+# writes this table; here it is committed by hand because the two sides of
+# this example live on branches of one repository, and the link verbs fetch
+# an estate's default branch (see the README). The key's private half never
+# existed: your own `fort link add` replaces this table and mints a real one.
+[links.estate-b]
+estate = "https://github.com/acme/estate-b"
+address = "10.12.0.254"
+port = 51821
+interface = "wg-b"
+zone = "estate-b.mesh"
+public_key = "i9JIKC5eQzSs55lwQjHQvrwB0PQtAbiyeZbKYozgSxM="   # the public half of wireguard-private-key-estate-b
