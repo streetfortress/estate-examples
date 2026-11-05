@@ -58,7 +58,7 @@ jobs:
       # Green here means: clone this branch, follow the README, and the
       # estate you get checks and evaluates clean.
       - name: Mint the fort (ephemeral — encryption only, nothing persists)
-        run: nix run ./nixos#fort -- mint keep --write
+        run: nix run ./nixos#fort -- mint outpost --write
 
       - name: Seed the edge Alertmanager webhook (a placeholder secret)
         run: |

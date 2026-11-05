@@ -1,4 +1,4 @@
-# keep — the one fort of the minimal estate: a lab VM on a libvirt
+# outpost — the one fort of the minimal estate: a lab VM on a libvirt
 # hypervisor, no [cluster] table. The hardened host, the mesh, the
 # deployer account and the ops verbs, and nothing else.
 mesh_ip = "10.10.0.10"

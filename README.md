@@ -39,7 +39,7 @@ One estate named `example`, with one fort:
 
 - `estate.toml` — the estate's facts: its name, its git URL, the mesh
   (`10.10.0.0/24`), the operator keys.
-- `forts/keep.toml` — the fort's declaration: a 2-vCPU lab VM on a
+- `forts/outpost.toml` — the fort's declaration: a 2-vCPU lab VM on a
   libvirt hypervisor.
 - `nixos/`, `flux/`, `mesh/`, `provisioning/` — everything `fort init`
   and `fort scaffold` render. Nothing here was written by hand except
@@ -66,23 +66,23 @@ files parse, and you replace both.
 3. Replace the admin recipient (an age public key, `age1…`) in
    `.sops.yaml` and `nixos/.sops.yaml` with your own. `age-keygen` makes
    one; keep the private half safe, it decrypts every secret you mint.
-4. Point `forts/keep.toml`'s `[libvirt] uri` and `ip` at your hypervisor
+4. Point `forts/outpost.toml`'s `[libvirt] uri` and `ip` at your hypervisor
    and network. If you change other values later, note that
-   `fort scaffold` never overwrites: delete `nixos/hosts/keep/` and
-   `flux/clusters/keep/` first, then re-run `fort scaffold keep --write`.
+   `fort scaffold` never overwrites: delete `nixos/hosts/outpost/` and
+   `flux/clusters/outpost/` first, then re-run `fort scaffold outpost --write`.
 5. Mint the fort's identity, then provide the two files init cannot
    write (`provisioning/secrets.yaml` per `provisioning/README.md`, and
    the Alertmanager webhook secret):
 
    ```
-   fort mint keep --write
+   fort mint outpost --write
    ```
 
 6. Commit, push, then build and deploy:
 
    ```
-   fort image keep
-   fort provision keep --image ~/.cache/forts/keep-nixos.qcow2
+   fort image outpost
+   fort provision outpost --image ~/.cache/forts/outpost-nixos.qcow2
    ```
 
 ## The expected pre-mint state
@@ -93,7 +93,7 @@ that is by design — each one names its repair:
 ```
 ✗ flux/infrastructure/configs: kustomize build: … alertmanager-edge-config.sops.yaml: no such file or directory
 ✗ mesh/ssh_config: missing — `fort ssh-config --write` renders it from peers.json + the manifests
-✗ nixos/secrets/keep.yaml: sfi.ops.console.enable is set … but deployer-password-hash is absent … Mint it: fort mint keep --write
+✗ nixos/secrets/outpost.yaml: sfi.ops.console.enable is set … but deployer-password-hash is absent … Mint it: fort mint outpost --write
 ```
 
 The second and third disappear when mint runs; the first when you seed
