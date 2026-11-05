@@ -28,10 +28,6 @@ single fort on a libvirt hypervisor.
 | `link-side-a` | an estate whose fort joins another estate's mesh — the linking side |
 | `link-side-b` | the estate being linked to — the recording side |
 
-Planned: a three-fort estate with a central monitoring node, and a
-multi-region layout. SFI packages common workload patterns (monitoring,
-object storage) as fort layers; the examples here wire everything by
-hand so you can see every piece.
 
 ## What's in this branch
 
@@ -44,11 +40,6 @@ One estate named `example`, with one fort:
 - `nixos/`, `flux/`, `mesh/`, `provisioning/` — everything `fort init`
   and `fort scaffold` render. Nothing here was written by hand except
   this README and the manifest.
-
-The estate ships **unminted**: no identity, no secrets, no keys of any
-kind. The admin recipient and operator key committed here are
-placeholders whose private halves were discarded — they exist so the
-files parse, and you replace both.
 
 ## Make it yours
 
@@ -75,7 +66,7 @@ files parse, and you replace both.
    the Alertmanager webhook secret):
 
    ```
-   fort mint outpost --write
+   fort mint outpost
    ```
 
 6. Commit, push, then build and deploy:
