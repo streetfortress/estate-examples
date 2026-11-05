@@ -11,3 +11,8 @@ disk = "40G"
 [libvirt]
 uri = "qemu+ssh://hypervisor.example/system"   # the machine that raises it — point this at yours
 ip = "192.168.1.10"                            # the VM's LAN address
+# lan_gateway = "192.168.1.1"                  # REQUIRED unless your LAN is 10.0.0.0/24:
+# lan_dns = ["192.168.1.1"]                    # the unset default is the lab's 10.0.0.1 (forts#265),
+                                               # and an off-subnet gateway means no default route — k3s won't start
+
+[cluster]   # k3s + flux: the example fort is a one-node flux cluster

@@ -6,11 +6,11 @@
         "sops-nix": "sops-nix"
       },
       "locked": {
-        "lastModified": 1793099688,
-        "narHash": "sha256-3eTJyiLFonb25YYzNdtKHcT7SX7T5nuw7TeXY9EZ+FE=",
+        "lastModified": 1793852043,
+        "narHash": "sha256-G/BB7gz4saLxDjk+kv3yITRy9vUoUhMk/YlMbmQ3UvE=",
         "ref": "refs/heads/main",
-        "rev": "d43f156618fb01673f11248a5046b32d5844bc92",
-        "revCount": 254,
+        "rev": "4299200b2f09ddd62b237d0b1fa9d715c79fffec",
+        "revCount": 286,
         "type": "git",
         "url": "https://github.com/streetfortress/forts"
       },
