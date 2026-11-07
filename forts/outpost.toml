@@ -1,6 +1,7 @@
 # outpost — the one fort of the minimal estate: a lab VM on a libvirt
-# hypervisor, no [cluster] table. The hardened host, the mesh, the
-# deployer account and the ops verbs, and nothing else.
+# hypervisor, raised as a one-node k3s + flux cluster ([cluster] below).
+# The hardened host, the mesh, the deployer account and the ops verbs,
+# and an apps tree with no workloads yet.
 mesh_ip = "10.10.0.10"
 
 [shape]

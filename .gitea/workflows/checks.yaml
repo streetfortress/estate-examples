@@ -52,29 +52,10 @@ jobs:
         # a full miss restores nothing.
         run: mkdir -p /nix-closure-cache
 
-      # This estate ships unminted (no identity, no secrets), so CI first
-      # performs the same ritual a new owner does, with ephemeral output:
-      # mint the fort, seed the one secret init cannot write, then gate.
-      # Green here means: clone this branch, follow the README, and the
-      # estate you get checks and evaluates clean.
-      - name: Mint the fort (ephemeral — encryption only, nothing persists)
-        run: nix run ./nixos#fort -- mint outpost --write
-
-      - name: Seed the edge Alertmanager webhook (a placeholder secret)
-        run: |
-          set -euo pipefail
-          f=flux/infrastructure/configs/monitoring/alertmanager-edge-config.sops.yaml
-          cat > "$f" <<'YAML'
-          apiVersion: v1
-          kind: Secret
-          metadata:
-            name: alertmanager-edge-config
-            namespace: monitoring
-          stringData:
-            webhook-url: https://example.invalid/hook
-          YAML
-          nix shell nixpkgs#sops -c sops --config .sops.yaml -e -i "$f"
-
+      # This estate ships minted: a throwaway identity, ciphertext only,
+      # its admin key destroyed (README, "The committed secrets are
+      # throwaway"). The gate runs on the checkout as-is — green means
+      # the committed reference itself checks and evaluates clean.
       - name: The gate (fort check --all --eval)
         env:
           GITEA_ACTIONS: "true"

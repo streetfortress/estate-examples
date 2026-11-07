@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: alertmanager-edge-config
+    namespace: monitoring
+stringData:
+    webhook-url: ENC[AES256_GCM,data:T/RDjIhcTE6UfSzhtdzyVyb11redIh3V2tDO+w==,iv:yKRG2cgz/hR9gv7W5OpNaHZGeYmOfHUXnI5u8XAX/i0=,tag:H7IjPxw1ssy7aBZjomIZEg==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBHcmhyZXh2YTgzdmVXbHEy
+            MjU3SGJXNlcvOHMrdXQydEpRZUduS2pSSGhFCnU1NHNybE1zbE55dzJqQm1WNDRV
+            YmdzRVZCRVlFMEQwNkFUdUtMRkNsWkUKLS0tIHJhSkUyUzVjaExOOThrUU5vaGVX
+            Mk9SUnNFUythSWhLUVE3cnNsaDFXTFUKBGyhWsPd1zc/tFAjsXXJfjLIwJPcPdbJ
+            LnOvQoxXohSBKZoUspxs0S4R5/1JIcJl9H3zJHM5Or66Q34IUsZVEQ==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1phuhxyvvmxey52x9rt2wf578ydll739rh4qth0tpwktewnje5qzs8vxx39
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBtREF3dE9ObllIaEF2WlI3
+            UEk4YmhoV1pRUnZsQkxzd3Z6ZVhOTFBnK1VjCnhuUkNGV05qRHZzQlpiaHZvMUhy
+            aExaSnFOam9QWHhJQ0dCcFByWG81T0kKLS0tIFMzWlgwOHdHclhxN28wNklGcm5j
+            NWJITGVuS25KVFdRK1M2RHJkMmVQdlEKsSSALmJWMZD3B8wgw7hfL7rLHwGisCGB
+            NJGIzrCYvmOGO4Uu5a6tjT8558Rag2+yQBfJWVvRuW6oJkrdjkT1qA==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age149950mjyruu2yxwyw2cv245tcr9j7k20kve8kv0vlr03kvuueuwsf7cf2t
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-07T22:44:51Z"
+    mac: ENC[AES256_GCM,data:DDQ9lJFYg6jbeZ7gGH97aZndAsjLG3DzeZbiOe380HBizku9aKxIF2WYUJMzBcokAQpujlrjDGDFg0CCkMHaAdhT5GH6beS53cRgsHTbwHWgtjcuwku2xgETFgYGUo7EG5HcA0AgblA0RNCtZVOA1qyFroVc6l6oJDbDDmbpNko=,iv:E9L+6Wsl6TqqI0E9IHimx8f0ZzyLL7Cmh3+Uo4UqDGU=,tag:bBRyjjEytClWfgB352wVDQ==,type:str]
+    version: 3.13.3

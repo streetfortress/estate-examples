@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: sops-canary
+    namespace: default
+type: Opaque
+stringData:
+    canary: ENC[AES256_GCM,data:VF15guR4Pfb/GwO1p2I=,iv:Zj2OqD6du++KoHhDuJVwMDc5T5MCb30L8sAruXhIU6U=,tag:tRacSRxOhcJmaivVt+B7Cg==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBVcHhCTHpVSDZjZGtzN1BK
+            cTROVStuajVjL1c5NWlUb013NFIwaFMrajM4CmFIeDQ2OUcyekREZTRBNGZDUElr
+            Nm0rSFZiTmQ2K0FKNys5VFROc0NRUlkKLS0tIGVKdEhsczNPd0R5UUk0cGVzcDBG
+            Sk53YTdQbXF4bDl1VHBQRU04MGR3TEEKtsY8O3H2mKAMSu+FbKgWgw6d0HwnAGhH
+            KfNwj8+gjr87zQ0aiO8DPzGvn9OTbhhaDWMTG98hxcgzy17mzc9PKQ==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1phuhxyvvmxey52x9rt2wf578ydll739rh4qth0tpwktewnje5qzs8vxx39
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB4dGV3cVhueXdkOUJFb284
+            WjRDNnpEUjhxcUw2K3lxdmNXTlFSUWVmNjJrCjZScENtWjF6NjJWUUh4M3grOGty
+            RWZuY01hTjl0Z0x4cVUyMzg2ZWFmVzAKLS0tIGtMeUVRUStsejVSTzRTY1dONytB
+            cnYzN1lPRDVTbWlubkgzbkdPVm1DZGMKsLLcW3bDJ2Hi7V1iBhm0I3KSTpnEInjr
+            WtA/xfF741BA+BPWfZ3riiHTllnknprEzZCKTXhozJwOeHYiBB7hXw==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age149950mjyruu2yxwyw2cv245tcr9j7k20kve8kv0vlr03kvuueuwsf7cf2t
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-07T22:44:43Z"
+    mac: ENC[AES256_GCM,data:bjujdCNqIIEFBx6iNWgLxMAhKhYSKD+6i/jc/sN7QtxX8F8gSyobGyW7fR7K40bsRR8U6UYS4huSalkYyJZhg/QAl3LVRKByYzpwJt5DcJA2EwIRD1yRM6ZF3GfJFw6FUFImebdAkM+TZFQnDnBwNZFzlmeyUT11ub2nzkWGBGk=,iv:Q8L9RP6PkU5rKBSRGVQ9cJiregAi5Wr81JClyeUDrFY=,tag:zAAqP3zptb8Z1XOTi0tXvg==,type:str]
+    version: 3.13.3

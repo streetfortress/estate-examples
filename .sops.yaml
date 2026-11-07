@@ -6,13 +6,21 @@
 # in every rule.
 #
 # Recipients:
-#   age17fsn7jhssgk7g8j425xq7n589pqyzfp0xsggtk3hvshhuafe9aaqyfcexy  admin
+#   age1phuhxyvvmxey52x9rt2wf578ydll739rh4qth0tpwktewnje5qzs8vxx39  admin
 creation_rules:
   - path_regex: provisioning/.*\.yaml$
     age:
-      - age17fsn7jhssgk7g8j425xq7n589pqyzfp0xsggtk3hvshhuafe9aaqyfcexy # admin
+      - age1phuhxyvvmxey52x9rt2wf578ydll739rh4qth0tpwktewnje5qzs8vxx39 # admin
+  # BEGIN fort sops rule: outpost
+  - path_regex: flux/(clusters|apps)/outpost/.*
+    encrypted_regex: ^(data|stringData)$
+    age:
+      - age1phuhxyvvmxey52x9rt2wf578ydll739rh4qth0tpwktewnje5qzs8vxx39 # admin
+      - age149950mjyruu2yxwyw2cv245tcr9j7k20kve8kv0vlr03kvuueuwsf7cf2t # outpost
+  # END fort sops rule: outpost
   - path_regex: flux/infrastructure/.*
     encrypted_regex: ^(data|stringData)$
     age:
-      - age17fsn7jhssgk7g8j425xq7n589pqyzfp0xsggtk3hvshhuafe9aaqyfcexy # admin
+      - age1phuhxyvvmxey52x9rt2wf578ydll739rh4qth0tpwktewnje5qzs8vxx39 # admin
       # fort-managed: one recipient per cluster
+      - age149950mjyruu2yxwyw2cv245tcr9j7k20kve8kv0vlr03kvuueuwsf7cf2t # cluster: outpost

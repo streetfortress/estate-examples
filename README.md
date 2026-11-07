@@ -3,28 +3,31 @@
 </p>
 
 <p align="center">
-    Try out <em><a href="https://github.com/streetfortress/forts">forts</a></em> using one of these <strong>example estates.</strong>
+    Reference estates for <em><a href="https://github.com/streetfortress/forts">Forts!</a></em>
 </p>
 
 An _estate_ is a git repository declaring one or more _forts_:
 - `estate.toml` declares the **Mesh** network CIDR and source repository URL.
 - `forts/<fort>.toml` declares a fort's size and its place on the estate's **Mesh** network.
 
-Each _branch_ in this repository is a complete scaffolding of an estate. Clone the branch into a new repository, customize the network and fort definitions, then run `fort mint` and provision each fort. You'll end up with a complete environment that continuously reconciles itself against your estate repo.
+Each _branch_ in this repository is a complete estate, rendered by the
+forts toolchain. It is a **reference, not a starting point**: don't
+clone it to begin — `fort estate init` renders a fresh estate matched
+to your forts version by construction. Start from the
+[getting started guide](https://github.com/streetfortress/forts/blob/main/docs/README.md)
+instead, and come back here after each lifecycle verb to check that
+your tree has grown the same shape this one has.
 
-Each branch has a customized README.md (AI Generated) tailored to the example scenario. Have fun building! - sf1tzp
+Each branch has a customized README.md (AI Generated) tailored to the
+example scenario. Have fun building! - sf1tzp
 
 ---
 
 ## Repo Structure
 
-Each branch of this repository is a complete estate: clone it, make it
-yours, mint it, and deploy. This branch, `main`, is the smallest one — a
-single fort on a libvirt hypervisor.
-
 | branch | what it shows |
 | --- | --- |
-| `main` | the minimal estate: one plain fort, the anonymous (public https) clone route |
+| `main` | the minimal estate: one k3s fort, an apps tree with no workloads |
 | `link-side-a` | an estate whose fort joins another estate's mesh — the linking side |
 | `link-side-b` | the estate being linked to — the recording side |
 
@@ -36,47 +39,56 @@ One estate named `example`, with one fort:
 - `estate.toml` — the estate's facts: its name, its git URL, the mesh
   (`10.10.0.0/24`), the operator keys.
 - `forts/outpost.toml` — the fort's declaration: a 2-vCPU lab VM on a
-  libvirt hypervisor.
-- `nixos/`, `flux/`, `mesh/`, `provisioning/` — everything `fort init`
-  and `fort scaffold` render. Nothing here was written by hand except
-  this README and the manifest.
+  libvirt hypervisor, raised as a one-node k3s + flux cluster
+  (`[cluster]`).
+- `nixos/`, `flux/`, `mesh/`, `provisioning/` — everything
+  `fort estate init`, `fort scaffold`, and `fort mint` render. Nothing
+  here was written by hand except this README, the manifest, and the
+  seeded Alertmanager webhook placeholder.
 
-## Make it yours
+## The checkpoints
 
-1. Clone this branch and push it to your own repository **as `main`** —
-   a deployed fort reconciles its repo's main branch, so the example
-   must become your main, not live beside it.
+Work through
+[getting started](https://github.com/streetfortress/forts/blob/main/docs/README.md)
+on your own estate, and diff against this branch after each verb:
 
-   ```
-   git clone -b main https://github.com/streetfortress/estate-examples my-estate
-   cd my-estate && git remote set-url origin <your repo> && git push -u origin main
-   ```
+1. **[`fort estate init`](https://github.com/streetfortress/forts/blob/main/docs/reference/init.md)**
+   renders the estate's boilerplate. Compare `estate.toml` and the
+   `nixos/`, `flux/`, `mesh/`, `provisioning/` skeletons: the flake and
+   the flux infrastructure tree. (Right after init your
+   `mesh/peers.json` is empty — mint fills it, and here it already has.)
+2. **[`fort scaffold <fort>`](https://github.com/streetfortress/forts/blob/main/docs/reference/scaffold.md)**
+   renders one fort's trees. Compare `nixos/hosts/outpost/`,
+   `flux/clusters/outpost/`, and `flux/apps/outpost/` — the apps
+   kustomization lists only the sops canary; workloads come later.
+3. **[`fort mint <fort>`](https://github.com/streetfortress/forts/blob/main/docs/reference/mint.md)**
+   generates the fort's identity. Compare `nixos/secrets/outpost.yaml`
+   (every value sops ciphertext, `ENC[AES256_GCM,…]`), the fort's entry
+   in `mesh/peers.json`, the re-rendered `mesh/ssh_config` and
+   `mesh/known_hosts`, the console registry in
+   `provisioning/console-passwords.yaml`, and the sops canary in
+   `flux/apps/outpost/`. This branch is committed **post-mint**, with a
+   throwaway identity — the next section says why that is safe.
 
-2. Edit `estate.toml`: set `[source] repo` to your repository's URL, and
-   replace `operator_keys` with your device's SSH public key.
-3. Replace the admin recipient (an age public key, `age1…`) in
-   `.sops.yaml` and `nixos/.sops.yaml` with your own. `age-keygen` makes
-   one; keep the private half safe, it decrypts every secret you mint.
-4. Point `forts/outpost.toml`'s `[libvirt] uri` and `ip` at your hypervisor
-   and network. If you change other values later, note that
-   `fort scaffold` never overwrites: delete `nixos/hosts/outpost/` and
-   `flux/clusters/outpost/` first, then re-run `fort scaffold outpost --write`.
-5. Mint the fort's identity, then provide the two files init cannot
-   write (`provisioning/secrets.yaml` per `provisioning/README.md`, and
-   the Alertmanager webhook secret):
+Your names will differ — the estate, the mesh CIDR, the fort, the
+hypervisor are yours. The shape is what to compare: which directories
+exist, which files are rendered, and what stays empty until a later
+verb fills it.
 
-   ```
-   fort mint outpost
-   ```
+## The committed secrets are throwaway — and committed on purpose
 
-6. Commit, push, then build and deploy:
+This branch holds real sops ciphertext in the open:
+`nixos/secrets/outpost.yaml`, the console registry, the webhook
+placeholder. That is the intended shape of a sops repo — **the
+ciphertext is committed**, and only the recipients listed in
+`.sops.yaml` can decrypt it. Here not even they can: this estate was
+minted with a throwaway admin age key that was destroyed after the
+commit, so nothing in this branch decrypts for anyone, and none of
+these keys was ever deployed anywhere. Your estate will look exactly
+like this; the difference is that your admin key lives in
+`~/.config/sops/age/keys.txt` and decrypts your files.
 
-   ```
-   fort image outpost
-   fort provision outpost --image ~/.cache/forts/outpost-nixos.qcow2
-   ```
-
-## The expected pre-mint state
+## What you'll see before mint
 
 Until you mint, `fort check --all` fails with exactly three errors, and
 that is by design — each one names its repair:
@@ -88,10 +100,9 @@ that is by design — each one names its repair:
 ```
 
 The second and third disappear when mint runs; the first when you seed
-the webhook secret. CI on this branch proves the path: on every push it
-mints an ephemeral identity, seeds a placeholder webhook, and runs
-`fort check --all --eval` — green means the ritual above lands on a
-clean estate.
+the webhook secret. This branch sits past that point, so CI runs
+`fort check --all --eval` directly on the checkout — green means the
+committed reference itself checks and evaluates clean.
 
 ## Reading on
 
@@ -99,5 +110,3 @@ The CLI handbook lives in the forts repository:
 [getting started](https://github.com/streetfortress/forts/blob/main/docs/README.md),
 one page per verb under
 [docs/reference](https://github.com/streetfortress/forts/blob/main/docs/reference).
-
-
